@@ -18,6 +18,16 @@ export default defineConfig({
         import.meta.dirname,
         'src/navigation/AppNavigator.web.tsx',
       ),
+      // Use web version of App to avoid React Navigation imports
+      '@/App': path.resolve(
+        import.meta.dirname,
+        'src/App.web.tsx',
+      ),
+      // Use web version of AppRoot
+      '@/AppRoot': path.resolve(
+        import.meta.dirname,
+        'src/AppRoot.web.tsx',
+      ),
       // Alias React Native internal modules to avoid errors
       'react-native/Libraries/Utilities/codegenNativeComponent': 'react-native-web',
       'react-native/Libraries/ReactNative/AppContainer': 'react-native-web',

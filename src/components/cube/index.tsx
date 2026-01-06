@@ -1,44 +1,29 @@
-import { Canvas, useThree } from '@react-three/fiber'
-import { OrbitControls, Environment } from '@react-three/drei'
-import { RubiksCube, type RubiksCubeRef, type CubeColors } from './RubiksCube'
-import { useRef, useEffect } from 'react'
-import * as THREE from 'three'
+/**
+ * Mobile stub for CubeViewer
+ * The web implementation is in index.web.tsx
+ */
+
 import type { KPattern } from 'cubing/kpuzzle'
-import { type SceneConfig, DEFAULT_CONFIG } from '@/config/scene-config'
+import * as THREE from 'three'
+import type { SceneConfig } from '@/config/scene-config'
 
-function CameraController({ config }: { config: SceneConfig }) {
-  const { camera } = useThree()
-
-  useEffect(() => {
-    if (camera instanceof THREE.PerspectiveCamera) {
-      camera.fov = config.camera.fov
-      camera.updateProjectionMatrix()
-    }
-  }, [camera, config.camera.fov])
-
-  return null
+// Type definitions for mobile (avoid importing RubiksCube which uses React Three Fiber)
+export interface RubiksCubeRef {
+  performMove: (move: string) => void
+  reset: () => void
 }
 
-function ResizeHandler() {
-  const { gl, camera } = useThree()
-
-  useEffect(() => {
-    const handleResize = () => {
-      gl.setSize(gl.domElement.clientWidth, gl.domElement.clientHeight)
-      if (camera instanceof THREE.PerspectiveCamera) {
-        camera.aspect = gl.domElement.clientWidth / gl.domElement.clientHeight
-        camera.updateProjectionMatrix()
-      }
-    }
-    
-    const timer = setTimeout(handleResize, 50)
-    return () => clearTimeout(timer)
-  }, [gl, camera])
-
-  return null
+export interface CubeColors {
+  white: string
+  yellow: string
+  green: string
+  blue: string
+  red: string
+  orange: string
+  inner: string
 }
 
-interface CubeViewerProps {
+export interface CubeViewerProps {
   pattern?: KPattern | null
   facelets?: string
   quaternionRef?: React.MutableRefObject<THREE.Quaternion>
@@ -49,60 +34,29 @@ interface CubeViewerProps {
   enableZoom?: boolean
 }
 
-export function CubeViewer({
-  pattern,
-  facelets,
-  quaternionRef,
-  cubeRef,
-  config = DEFAULT_CONFIG,
-  animationSpeed,
-  cubeColors,
-  enableZoom = true,
-}: CubeViewerProps) {
-  const internalRef = useRef<RubiksCubeRef>(null)
-  const ref = cubeRef || internalRef
-
+/**
+ * Mobile stub for CubeViewer
+ * On mobile, 3D rendering is not available
+ * Returns a placeholder or null
+ */
+export function CubeViewer(_props: CubeViewerProps) {
+  // Return a simple placeholder for mobile
+  // You could replace this with a 2D cube representation using react-native-svg
   return (
-    <div className="h-full w-full">
-      <Canvas camera={{ position: config.camera.position, fov: config.camera.fov }}>
-        <CameraController config={config} />
-        <ResizeHandler />
-        <ambientLight intensity={config.light.ambient.intensity} />
-        <directionalLight
-          position={config.light.directional1.position}
-          intensity={config.light.directional1.intensity}
-        />
-        <directionalLight
-          position={config.light.directional2.position}
-          intensity={config.light.directional2.intensity}
-        />
-        <group scale={config.cube.scale}>
-          <RubiksCube
-            ref={ref}
-            quaternionRef={quaternionRef}
-            pattern={pattern}
-            facelets={facelets}
-            materialConfig={config.material}
-            animationSpeed={animationSpeed}
-            cubeColors={cubeColors}
-          />
-        </group>
-        <OrbitControls
-          enablePan={false}
-          enableZoom={enableZoom}
-          minDistance={config.camera.minDistance}
-          maxDistance={config.camera.maxDistance}
-          enableDamping
-          dampingFactor={0.05}
-          minPolarAngle={0}
-          maxPolarAngle={Math.PI}
-          minAzimuthAngle={-Infinity}
-          maxAzimuthAngle={Infinity}
-        />
-        <Environment preset={config.environment.preset} />
-      </Canvas>
+    <div style={{ 
+      width: '100%', 
+      height: '100%', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      backgroundColor: '#1a1a1a',
+      borderRadius: 8,
+    }}>
+      <div style={{ color: '#666', fontSize: 14, textAlign: 'center' }}>
+        3D Cube Viewer
+        <br />
+        <span style={{ fontSize: 12 }}>Not available on mobile</span>
+      </div>
     </div>
   )
 }
-
-export { type RubiksCubeRef, type CubeColors }

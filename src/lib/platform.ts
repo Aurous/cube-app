@@ -7,6 +7,17 @@ export const isReactNative = !isWeb && typeof navigator !== 'undefined' && navig
 export const isExpo = typeof global !== 'undefined' && global.expo !== undefined
 
 /**
+ * Cross-platform environment variable access
+ * Platform-specific implementations are in env.web.ts and env.native.ts
+ * Metro will use env.native.ts, Vite will use env.web.ts
+ */
+
+// Re-export from platform-specific files
+// Metro will resolve to env.native.ts (no .web extension)
+// Vite will resolve to env.web.ts (via .web.ts extension)
+export { getEnv, isDev } from './env'
+
+/**
  * Platform-specific event emitter for settings changes
  */
 class PlatformEventEmitter {

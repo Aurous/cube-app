@@ -4,6 +4,7 @@ import { Trophy, Star, Sparkles, Zap } from 'lucide-react'
 import confetti from 'canvas-confetti'
 import { ACHIEVEMENTS } from '@/lib/achievements'
 import type { AchievementTier } from '@/types/achievements'
+import { isDev } from '@/lib/platform'
 
 interface Notification {
   id: string
@@ -164,7 +165,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (import.meta.env.DEV) {
+      if (isDev()) {
         if (e.ctrlKey && e.shiftKey && e.key === 'A') {
           e.preventDefault()
           triggerTestAchievement()

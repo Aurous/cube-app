@@ -1,20 +1,25 @@
-import { connectGanCube, type GanCubeConnection, type GanCubeEvent } from 'gan-web-bluetooth'
+/**
+ * Mobile stub for GanAdapter
+ * The web implementation using gan-web-bluetooth is in gan-adapter.web.ts
+ * On mobile, Bluetooth will need to be implemented using expo-bluetooth or react-native-ble-manager
+ */
+
 import { BaseAdapter } from './base-adapter'
 import type { CubeCapabilities, AdapterConnectOptions, CubeBrand } from './types'
-
-const VALID_MOVE_REGEX = /^[RLUDFB]['2]?$/
 
 export interface GanAdapterOptions {
   brand?: CubeBrand
   hasGyroscope?: boolean
 }
 
+/**
+ * Mobile stub for GanAdapter
+ * TODO: Implement mobile Bluetooth using expo-bluetooth or react-native-ble-manager
+ */
 export class GanAdapter extends BaseAdapter {
   readonly brand: CubeBrand
   readonly isExperimental: boolean
   readonly capabilities: CubeCapabilities
-
-  private connection: GanCubeConnection | null = null
 
   constructor(options: GanAdapterOptions = {}) {
     super()
@@ -27,94 +32,20 @@ export class GanAdapter extends BaseAdapter {
     }
   }
 
-  async connect(options: AdapterConnectOptions = {}): Promise<void> {
-    if (this._isConnected) {
-      return
-    }
-
-    const macAddressProvider = options.macAddressProvider
-      ? async (_device: BluetoothDevice, isFallbackCall?: boolean): Promise<string | null> => {
-          return options.macAddressProvider!(isFallbackCall ?? false)
-        }
-      : undefined
-
-    this.connection = await connectGanCube(macAddressProvider)
-    this._deviceName = this.connection.deviceName
-    this._isConnected = true
-
-    this.connection.events$.subscribe({
-      next: (event) => this.handleGanEvent(event),
-      error: (err) => {
-        console.error(`[${this.brand}] Connection error:`, err)
-        this.emitDisconnect()
-      },
-      complete: () => {
-        this.emitDisconnect()
-      },
-    })
-  }
-
-  private handleGanEvent(event: GanCubeEvent): void {
-    const timestamp = event.timestamp ?? Date.now()
-
-    switch (event.type) {
-      case 'MOVE':
-        if (event.move && VALID_MOVE_REGEX.test(event.move)) {
-          this.emitMove(event.move, timestamp)
-        }
-        break
-
-      case 'GYRO':
-        if (this.capabilities.gyroscope && event.quaternion) {
-          this.emitGyro(
-            {
-              x: event.quaternion.x,
-              y: event.quaternion.y,
-              z: event.quaternion.z,
-              w: event.quaternion.w,
-            },
-            timestamp,
-          )
-        }
-        break
-
-      case 'BATTERY':
-        if (event.batteryLevel !== undefined) {
-          this.emitBattery(event.batteryLevel, timestamp)
-        }
-        break
-
-      case 'FACELETS':
-        if (event.facelets) {
-          this.emitFacelets(event.facelets, timestamp)
-        }
-        break
-
-      case 'DISCONNECT':
-        this.connection = null
-        this.emitDisconnect(timestamp)
-        break
-    }
+  async connect(_options: AdapterConnectOptions = {}): Promise<void> {
+    // TODO: Implement mobile Bluetooth connection
+    throw new Error('GanAdapter is not yet implemented for mobile. Use web version or implement mobile Bluetooth.')
   }
 
   async disconnect(): Promise<void> {
-    if (this.connection) {
-      await this.connection.disconnect()
-      this.connection = null
-      this._isConnected = false
-      this._deviceName = null
-    }
+    // TODO: Implement mobile Bluetooth disconnection
   }
 
   async requestBattery(): Promise<void> {
-    if (this.connection) {
-      await this.connection.sendCubeCommand({ type: 'REQUEST_BATTERY' })
-    }
+    // TODO: Implement mobile battery request
   }
 
   async requestFacelets(): Promise<void> {
-    if (this.connection) {
-      await this.connection.sendCubeCommand({ type: 'REQUEST_FACELETS' })
-    }
+    // TODO: Implement mobile facelets request
   }
 }

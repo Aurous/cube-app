@@ -1,4 +1,9 @@
-import { connectSmartPuzzle, type BluetoothPuzzle, type MoveEvent } from 'cubing/bluetooth'
+/**
+ * Mobile stub for GiikerAdapter
+ * The web implementation using cubing/bluetooth is in giiker-adapter.web.ts
+ * On mobile, Bluetooth will need to be implemented using expo-bluetooth or react-native-ble-manager
+ */
+
 import { BaseAdapter } from './base-adapter'
 import type { CubeCapabilities, AdapterConnectOptions, CubeBrand } from './types'
 
@@ -11,43 +16,20 @@ export class GiikerAdapter extends BaseAdapter {
     facelets: true,
   }
 
-  private puzzle: BluetoothPuzzle | null = null
-
   async connect(_options: AdapterConnectOptions = {}): Promise<void> {
-    if (this._isConnected) {
-      return
-    }
-
-    this.puzzle = await connectSmartPuzzle()
-    this._deviceName = this.puzzle.name?.() ?? 'GiiKER Cube'
-    this._isConnected = true
-
-    this.puzzle.addAlgLeafListener((event: MoveEvent) => {
-      const move = event.latestAlgLeaf.toString()
-      this.emitMove(move, event.timeStamp)
-    })
-
-    this.puzzle.addEventListener('disconnect', () => {
-      this.emitDisconnect()
-      this.puzzle = null
-    })
+    // TODO: Implement mobile Bluetooth connection
+    throw new Error('GiikerAdapter is not yet implemented for mobile. Use web version or implement mobile Bluetooth.')
   }
 
   async disconnect(): Promise<void> {
-    if (this.puzzle) {
-      this.puzzle.disconnect()
-      this.puzzle = null
-      this._isConnected = false
-      this._deviceName = null
-    }
+    // TODO: Implement mobile Bluetooth disconnection
   }
 
   async requestBattery(): Promise<void> {
-    // GiiKER cubes don't support battery level queries via cubing.js
+    // TODO: Implement mobile battery request
   }
 
   async requestFacelets(): Promise<void> {
-    // Facelets are obtained via getPattern() but not emitted as events
-    // in cubing.js - would need to call puzzle.getPattern() and convert
+    // TODO: Implement mobile facelets request
   }
 }

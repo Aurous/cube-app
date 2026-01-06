@@ -2,6 +2,7 @@ import { X, Bluetooth, FlaskConical, Compass, ExternalLink, Box, Check, Smartpho
 import { useState, useMemo } from 'react'
 import { CUBE_BRANDS, type CubeBrand, getBrandInfo } from '@/lib/cube-protocols'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { isDev } from '@/lib/platform'
 
 type Platform = 'android' | 'windows' | 'mac' | 'linux' | 'ios' | 'unknown'
 
@@ -64,7 +65,7 @@ export function BrandPickerModal({
 
   if (!isOpen) return null
 
-  const visibleBrands = CUBE_BRANDS.filter((b) => b.brand !== 'mock' || import.meta.env.DEV)
+  const visibleBrands = CUBE_BRANDS.filter((b) => b.brand !== 'mock' || isDev())
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
