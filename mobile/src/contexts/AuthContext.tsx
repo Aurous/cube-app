@@ -5,16 +5,20 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import auth from '@react-native-firebase/auth'
-import { GoogleSignin } from '@react-native-google-signin/google-signin'
-import { isOfflineMode } from '@/lib/firebase'
+import { isOfflineMode, authInstance as auth } from '@/lib/firebase'
+import { getGoogleSignin } from '@/lib/google-signin'
 
-// Conditionally import native modules
-type FirebaseAuthTypes = any
+type FirebaseUser = {
+  uid: string
+  email: string | null
+  displayName: string | null
+  photoURL?: string | null
+  updateProfile?: (profile: { displayName?: string; photoURL?: string }) => Promise<void>
+}
 
 
 interface AuthContextType {
-  user: FirebaseAuthTypes.User | null
+  user: FirebaseUser | null
   loading: boolean
   isOffline: boolean
   signInWithGoogle: () => Promise<void>
@@ -27,30 +31,47 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null)
+  const [user, setUser] = useState<FirebaseUser | null>(null)
   const [loading, setLoading] = useState(!isOfflineMode)
 
   useEffect(() => {
     if (isOfflineMode || !auth) {
-      setLoading(false)
+      // Use setTimeout to avoid synchronous setState in effect
+      setTimeout(() => setLoading(false), 0)
       return
     }
 
     // Configure Google Sign-In
+    const GoogleSignin = getGoogleSignin()
     if (GoogleSignin) {
       GoogleSignin.configure({
         webClientId: '', // Add your web client ID from Firebase console
       })
     }
 
-    const unsubscribe = auth().onAuthStateChanged((user: any) => {
-      setUser(user)
+    const unsubscribe = auth.onAuthStateChanged((firebaseUser: {
+      uid: string
+      email: string | null
+      displayName: string | null
+      updateProfile?: (profile: { displayName?: string; photoURL?: string }) => Promise<void>
+    } | null) => {
+      if (firebaseUser) {
+        setUser({
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName,
+          updateProfile: firebaseUser.updateProfile?.bind(firebaseUser),
+        })
+      } else {
+        setUser(null)
+      }
       setLoading(false)
     })
     return unsubscribe
   }, [])
 
   const signInWithGoogle = async () => {
+    const GoogleSignin = getGoogleSignin()
     if (isOfflineMode || !auth || !GoogleSignin) {
       console.warn('Firebase not configured - running in offline mode')
       return
@@ -59,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true })
       const { idToken } = await GoogleSignin.signIn()
       const googleCredential = auth.GoogleAuthProvider.credential(idToken)
-      await auth().signInWithCredential(googleCredential)
+      await auth.signInWithCredential(googleCredential)
     } catch (error) {
       console.error('Failed to sign in with Google:', error)
       throw error
@@ -67,37 +88,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signInWithEmail = async (email: string, password: string) => {
-    if (isOfflineMode) {
+    if (isOfflineMode || !auth) {
       console.warn('Firebase not configured - running in offline mode')
       return
     }
-    await auth().signInWithEmailAndPassword(email, password)
+    await auth.signInWithEmailAndPassword(email, password)
   }
 
   const registerWithEmail = async (email: string, password: string, displayName?: string) => {
-    if (isOfflineMode) {
+    if (isOfflineMode || !auth) {
       console.warn('Firebase not configured - running in offline mode')
       return
     }
-    const result = await auth().createUserWithEmailAndPassword(email, password)
-    if (displayName && result.user) {
+    const result = await auth.createUserWithEmailAndPassword(email, password)
+    if (displayName && result.user && result.user.updateProfile) {
       await result.user.updateProfile({ displayName })
     }
   }
 
   const resetPassword = async (email: string) => {
-    if (isOfflineMode) {
+    if (isOfflineMode || !auth) {
       console.warn('Firebase not configured - running in offline mode')
       return
     }
-    await auth().sendPasswordResetEmail(email)
+    await auth.sendPasswordResetEmail(email)
   }
 
   const logout = async () => {
-    if (isOfflineMode) return
+    if (isOfflineMode || !auth) return
     try {
-      await auth().signOut()
-      await GoogleSignin.signOut()
+      await auth.signOut()
+      const GoogleSignin = getGoogleSignin()
+      if (GoogleSignin) {
+        await GoogleSignin.signOut()
+      }
     } catch (error) {
       console.error('Failed to sign out:', error)
       throw error

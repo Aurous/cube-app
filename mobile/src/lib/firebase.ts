@@ -1,22 +1,15 @@
 // Firebase modules - will be available after native build
-let auth: any = null
-let firestore: any = null
-let storage: any = null
+// Using dynamic imports to handle missing modules gracefully
+import { getAuth, isAuthAvailable } from './firebase-auth'
+import { getDb, isFirestoreAvailable } from './firebase-firestore'
+import { getStorage, isStorageAvailable } from './firebase-storage'
 
-try {
-  auth = require('@react-native-firebase/auth').default
-  firestore = require('@react-native-firebase/firestore').default
-  storage = require('@react-native-firebase/storage').default
-} catch (e) {
-  console.warn('Firebase native modules not available - running in offline mode')
-}
+// Check if Firebase is configured (functions to check availability)
+export const isOfflineMode = !isAuthAvailable() || !isFirestoreAvailable() || !isStorageAvailable()
 
-// Check if Firebase is configured
-export const isOfflineMode = !auth || !firestore || !storage
-
-export const db = firestore ? firestore() : null
-export const authInstance = auth ? auth() : null
-export const storageInstance = storage ? storage() : null
+export const authInstance = getAuth()
+export const db = getDb()
+export const storageInstance = getStorage()
 
 // For compatibility with web code
 export { authInstance as auth, db, storageInstance as storage }
