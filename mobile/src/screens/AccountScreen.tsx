@@ -312,7 +312,11 @@ export default function AccountScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <View style={styles.container}>
+      <ScrollView 
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
       <View style={styles.header}>
         <Text style={styles.title}>Account</Text>
         <View style={styles.toggleContainer}>
@@ -368,7 +372,8 @@ export default function AccountScreen() {
           ))
         )}
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   )
 }
 
@@ -376,9 +381,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
+    justifyContent: 'center',
   },
   content: {
     padding: 16,
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   header: {
     flexDirection: 'row',
