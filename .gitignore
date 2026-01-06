@@ -34,5 +34,8 @@ dist-ssr
 # Local Netlify folder
 .netlify
 
+# Turborepo
+.turbo
+
 GEMINI.md
 copilot-instructions.md

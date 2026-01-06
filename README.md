@@ -140,6 +140,7 @@ As a software developer and speedcubing enthusiast, I've been inspired by amazin
 - **Backend** — Firebase (Auth, Firestore)
 - **Charts** — Recharts
 - **Hosting** — Netlify
+- **Monorepo** — Turborepo
 
 ---
 
@@ -157,16 +158,31 @@ As a software developer and speedcubing enthusiast, I've been inspired by amazin
 git clone https://github.com/gisketch/kitsune-cube.git
 cd kitsune-cube
 
-# Install dependencies
+# Install dependencies (installs for all workspaces)
 npm install
 
 # Start development server
 npm run dev
 ```
 
+### Project Structure
+
+This project uses [Turborepo](https://turbo.build) for monorepo management:
+
+```
+/
+├── apps/
+│   └── web/          # Main web application
+├── packages/         # Shared packages (future)
+├── turbo.json        # Turborepo configuration
+└── package.json      # Root workspace configuration
+```
+
+All development commands are run from the root using Turborepo, which orchestrates tasks across workspaces.
+
 ### Environment Variables
 
-Create a `.env` file in the root directory:
+Create a `.env` file in the `apps/web/` directory:
 
 ```env
 VITE_FIREBASE_API_KEY=your_api_key
@@ -207,14 +223,19 @@ npm run release:minor   # or release:patch
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Build for production |
+| `npm run dev` | Start development server (via Turborepo) |
+| `npm run build` | Build for production (via Turborepo) |
+| `npm run lint` | Lint the codebase (via Turborepo) |
+| `npm run test` | Run tests in watch mode (via Turborepo) |
+| `npm run format` | Format with Prettier (via Turborepo) |
+| `npm run format:check` | Check formatting (via Turborepo) |
+
+**App-specific scripts** (run from `apps/web/` directory):
+| Command | Description |
+|---------|-------------|
 | `npm run release:minor` | Release with new features |
 | `npm run release:patch` | Release with bug fixes |
 | `npm run deploy` | Build and deploy to Netlify |
-| `npm run test` | Run tests in watch mode |
-| `npm run lint` | Lint the codebase |
-| `npm run format` | Format with Prettier |
 
 ---
 
