@@ -1,8 +1,8 @@
 {
   "version": "0.1.3",
-  "commitHash": "8c81ae8",
-  "commitDate": "2026-01-05",
-  "branch": "main",
+  "commitHash": "22e6db6",
+  "commitDate": "2026-01-06",
+  "branch": "feature/monorepo",
   "buildDate": "2026-01-06",
   "stage": "beta"
 }

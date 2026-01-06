@@ -1,0 +1,15 @@
+{
+  "name": "@cube-timer/shared-platform",
+  "version": "0.1.3",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "private": true,
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.1.0",
+    "react-native-ble-plx": "^3.1.2"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.5",
+    "typescript": "~5.9.3"
+  }
+}

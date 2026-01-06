@@ -1,0 +1,22 @@
+# Expo
+.expo/
+dist/
+web-build/
+
+# Node
+node_modules/
+
+# macOS
+.DS_Store
+
+# Temporary files
+*.log
+*.tmp
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
