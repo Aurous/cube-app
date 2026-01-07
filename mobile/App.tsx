@@ -10,12 +10,20 @@ export default function App() {
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
   const [devices, setDevices] = useState<Device[]>([]);
   const [isScanning, setIsScanning] = useState(false);
+  const [filterNames] = useState(['gan']); // Filter for device names containing these strings
 
   useEffect(() => {
     return () => {
       bleManager.destroy();
     };
   }, []);
+
+  const filterDevices = (deviceList: Device[]): Device[] => {
+    return deviceList.filter(d => {
+      const name = d.name ? d.name.toLowerCase() : '';
+      return filterNames.some(filter => name.includes(filter.toLowerCase()));
+    });
+  };
 
   const requestPermissions = async () => {
     if (Platform.OS === 'android') {
@@ -145,7 +153,7 @@ export default function App() {
                 {isScanning ? 'Scanning for devices...' : 'No devices found'}
               </Text>
             ) : (
-              devices.map((device) => (
+              filterDevices(devices).map((device) => (
                 <View key={device.id} style={styles.deviceItem}>
                   <View style={styles.deviceInfo}>
                     <Text style={styles.deviceName}>
