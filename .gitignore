@@ -36,3 +36,7 @@ dist-ssr
 
 GEMINI.md
 copilot-instructions.md
+
+mobile/android/
+
+mobile/.expo/
